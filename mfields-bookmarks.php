@@ -21,17 +21,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-Changelog
-0.3
-	- Added Documentation
-	- Fine tuning of custom objects.
-	- Move all hooks inside constructor.
-0.2
-	- Flush rewrite on activation and deactivation.
-	- Created Mfields_Bookmark_Post_Type class.
-0.1
-	- Initial plugin
 */
 
 class Mfields_Bookmark_Post_Type {
