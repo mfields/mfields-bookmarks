@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name:       AAA Mfields Bookmarks
+Plugin Name:       Mfields Bookmarks
 Description:       Enables a custom post_type for bookmarks.
 Version:           0.3
 Author:            Michael Fields
