@@ -37,8 +37,11 @@ class Mfields_Bookmark_Post_Type {
 		register_deactivation_hook( __FILE__, array( &$this, 'deactivate' ) );
 		add_action( 'init', array( &$this, 'register_post_type' ), 0 );
 		add_action( 'init', array( &$this, 'register_taxonomies' ), 0 );
+		add_action( 'admin_menu', array( &$this, 'register_meta_boxen' ) );
 		add_action( 'admin_head-post-new.php', array( &$this, 'process_bookmarklet' ) );
+		add_action( 'save_post', array( &$this, 'meta_save' ), 10, 2 );
 		add_filter( 'the_content', array( &$this, 'append_link_to_content' ), 0 );
+		add_filter( 'post_thumbnail_html', array( &$this, 'screenshot' ) );
 	}
 	/**
 	 * Activation.
@@ -202,19 +205,32 @@ class Mfields_Bookmark_Post_Type {
 		}
 	}
 	/**
-	 * Append Bookmark link to the content on multiple views.
+	 * Append Bookmark link to the content.
+	 *
+	 * @since      unknown
 	 */
 	function append_link_to_content( $content ) {
-		if ( ! is_singular() && 'mfields_bookmark' === get_post_type() ) {
-			$url = esc_url( get_post_meta( get_the_ID(), 'bookmark_url', true ) );
-			if ( !empty( $url ) ) {
-				$content .= ' <a href="' . $url . '" rel="external">Visit Site</a>';
+		if ( 'mfields_bookmark' == get_post_type() ) {
+			$meta = array(
+				'text' => (string) get_post_meta( get_the_ID(), '_mfields_bookmark_link_text', true ),
+				'url'  => (string) esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) ),
+				);
+
+			$text = 'Visit Site';
+			if ( ! empty( $meta['text'] ) ) {
+				$text = $meta['text'];
+			}
+
+			if ( ! empty( $meta['url'] ) ) {
+				$content .= ' <a href="' . esc_url( $meta['url'] ) . '" rel="external">' . esc_html( $text ) . '</a>';
 			}
 		}
 		return $content;
 	}
 	/**
 	 * jQuery to process bookmarklet requests on post-new.php
+	 *
+	 * @since      unknown
 	 */
 	function process_bookmarklet() {
 		if ( isset( $_GET['mfields_bookmark_url'] ) && 'mfields_bookmark' === get_post_type() ) {
@@ -222,12 +238,109 @@ class Mfields_Bookmark_Post_Type {
 			print <<< EOF
 			<script type="text/javascript">
 			jQuery( document ).ready( function ( $ ) {
-				$( '#metakeyselect' ).val( 'resource_url' );
-				$( '#metavalue' ).text( '{$url}' );
+				$( '#mfields_bookmark_url' ).val( 'resource_url' );
 			} );
 			</script>
 EOF;
 		}
+	}
+	/**
+	 * Register Metaboxen.
+	 *
+	 * @uses       Mfields_Bookmark_Post_Type::meta_box()
+	 * @since      2011-03-12
+	 */
+	function register_meta_boxen() {
+		add_meta_box( 'mfields_bookmark_meta', 'Bookmark Data', array( &$this, 'meta_box' ), 'mfields_bookmark', 'side', 'high' );
+	}
+	/**
+	 * Meta Box.
+	 *
+	 * @since      2011-03-12
+	 */
+	function meta_box() {
+		/* URL. */
+		$key = '_mfields_bookmark_url';
+		$url = get_post_meta( get_the_ID(), $key, true );
+		print "\n\t" . '<p><label for="' . esc_attr( $key ) . '">URL</label>';
+		print "\n\t" . '<input id="' . esc_attr( $key ) . '" type="text" class="widefat" name="' . esc_attr( $key ) . '" value="' . esc_url( $url ) . '" /></p>';
+
+		/* Link Text. */
+		$key = '_mfields_bookmark_link_text';
+		$text = get_post_meta( get_the_ID(), $key, true );
+		print "\n\t" . '<p><label for="' . esc_attr( $key ) . '">Link Text</label>';
+		print "\n\t" . '<input id="' . esc_attr( $key ) . '" type="text" class="widefat" name="' . esc_attr( $key ) . '" value="' . esc_attr( $text ) . '" /></p>';
+
+		/* Nonce field. */
+		print "\n" . '<input type="hidden" name="mfields_bookmark_meta_nonce" value="' . esc_attr( wp_create_nonce( 'update-mfields_bookmark-meta-for-' . get_the_ID() ) ) . '" />';
+	}
+	/**
+	 * Save Meta Data.
+	 *
+	 * @since      2011-03-12
+	 */
+	function meta_save( $ID, $post ) {
+		/* Local variables. */
+		$ID               = absint( $ID );
+		$unique           = 'mfields_bookmark_url';
+		$meta_key         = '_' . $unique;
+		$post_type        = get_post_type();
+		$post_type_object = get_post_type_object( $post_type );
+		$capability       = '';
+		$url              = '';
+
+		/* Do nothing on auto save. */
+		if ( defined( 'DOING_AUTOSAVE' ) && true === DOING_AUTOSAVE ) {
+			return;
+		}
+
+		/* Return early if custom value is not present in POST request. */
+		if ( ! isset( $_POST['_mfields_bookmark_url'] ) || ! isset( $_POST['_mfields_bookmark_link_text'] ) ) {
+			return;
+		}
+
+		/* This function only applies to the following post_types. */
+		if ( ! in_array( $post_type, array( 'mfields_bookmark' ) ) ) {
+			return;
+		}
+
+		/* Terminate script if accessed from outside the administration panels. */
+		check_admin_referer( 'update-mfields_bookmark-meta-for-' . $ID, 'mfields_bookmark_meta_nonce' );
+
+		/* Find correct capability from post_type arguments. */
+		if ( isset( $post_type_object->cap->edit_posts ) ) {
+			$capability = $post_type_object->cap->edit_posts;
+		}
+
+		/* Return if current user cannot edit this post. */
+		if ( ! current_user_can( $capability ) ) {
+			return;
+		}
+
+		/* Save post meta. */
+		update_post_meta( $ID, '_mfields_bookmark_url', esc_url_raw( $_POST['_mfields_bookmark_url'] ) );
+		update_post_meta( $ID, '_mfields_bookmark_link_text', esc_html( $_POST['_mfields_bookmark_link_text'] ) );
+
+	}
+	/**
+	 * Screenshot.
+	 *
+	 * This is a modified version of Binary Moon's bm_shots plugin.
+	 * Uses WordPress API to take a screen shot where no featured image
+	 * has been defined. This should be viewed as an emergency fallback
+	 * until a featured image can be acquired.
+	 *
+	 * @since      2011-03-12
+	 */
+	function screenshot( $html ) {
+		if ( empty( $html ) || 'mfields_bookmark' == get_post_type() ) {
+			$url = esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) );
+			if ( ! empty( $url ) ) {
+				$src = 'http://s.wordpress.com/mshots/v1/' . urlencode( $url ) . '?w=150';
+				$html = "\n" . '<a href="' . esc_url( $url ) . '" tabindex="-1"><img src="' . esc_url( $src ) . '" alt="" /></a>';
+			}
+		}
+		return $html;
 	}
 }
 $mfields_bookmark_post_type = new Mfields_Bookmark_Post_Type();
