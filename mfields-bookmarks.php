@@ -102,10 +102,6 @@ class Mfields_Bookmark_Post_Type {
 			'supports' => array(
 				'title',
 				'editor',
-				'comments',
-				'thumbnail',
-				'trackbacks',
-				'custom-fields',
 				),
 			'labels' => array(
 				'name'               => 'Bookmarks',
