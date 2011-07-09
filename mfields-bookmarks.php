@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 Mfields_Bookmarks::init();
 
 class Mfields_Bookmarks {
+
 	/**
 	 * Constructor.
 	 *
@@ -45,6 +46,7 @@ class Mfields_Bookmarks {
 		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 20 );
 		add_filter( 'post_thumbnail_html',     array( __class__, 'screenshot' ) );
 	}
+
 	/**
 	 * Activation.
 	 *
@@ -63,6 +65,7 @@ class Mfields_Bookmarks {
 		self::register_taxonomies();
 		flush_rewrite_rules();
 	}
+
 	/**
 	 * Deactivation.
 	 *
@@ -76,6 +79,7 @@ class Mfields_Bookmarks {
 	static public function deactivate() {
 		flush_rewrite_rules();
 	}
+
 	/**
 	 * Register post_type.
 	 *
@@ -121,6 +125,7 @@ class Mfields_Bookmarks {
 			)
 		);
 	}
+
 	/**
 	 * Register taxonomies.
 	 *
@@ -202,6 +207,7 @@ class Mfields_Bookmarks {
 				) );
 		}
 	}
+
 	/**
 	 * Append Bookmark link to the content.
 	 *
@@ -228,6 +234,7 @@ class Mfields_Bookmarks {
 
 		return $content;
 	}
+
 	/**
 	 * jQuery to process bookmarklet requests on post-new.php
 	 *
@@ -245,6 +252,7 @@ class Mfields_Bookmarks {
 EOF;
 		}
 	}
+
 	/**
 	 * Register Metaboxen.
 	 *
@@ -254,6 +262,7 @@ EOF;
 	static public function register_meta_boxen() {
 		add_meta_box( 'mfields_bookmark_meta', 'Bookmark Data', array( __class__, 'meta_box' ), 'mfields_bookmark', 'side', 'high' );
 	}
+
 	/**
 	 * Meta Box.
 	 *
@@ -275,6 +284,7 @@ EOF;
 		/* Nonce field. */
 		print "\n" . '<input type="hidden" name="mfields_bookmark_meta_nonce" value="' . esc_attr( wp_create_nonce( 'update-mfields_bookmark-meta-for-' . get_the_ID() ) ) . '" />';
 	}
+
 	/**
 	 * Save Meta Data.
 	 *
@@ -323,6 +333,7 @@ EOF;
 		update_post_meta( $ID, '_mfields_bookmark_link_text', esc_html( $_POST['_mfields_bookmark_link_text'] ) );
 
 	}
+
 	/**
 	 * Screenshot.
 	 *
