@@ -40,7 +40,7 @@ class Mfields_Bookmark_Post_Type {
 		add_action( 'admin_menu', array( &$this, 'register_meta_boxen' ) );
 		add_action( 'admin_head-post-new.php', array( &$this, 'process_bookmarklet' ) );
 		add_action( 'save_post', array( &$this, 'meta_save' ), 10, 2 );
-		add_filter( 'the_content', array( &$this, 'append_link_to_content' ), 0 );
+		add_filter( 'the_content', array( &$this, 'append_link_to_content' ), 20 );
 		add_filter( 'post_thumbnail_html', array( &$this, 'screenshot' ) );
 	}
 	/**
@@ -210,21 +210,24 @@ class Mfields_Bookmark_Post_Type {
 	 * @since      unknown
 	 */
 	function append_link_to_content( $content ) {
-		if ( 'mfields_bookmark' == get_post_type() ) {
-			$meta = array(
-				'text' => (string) get_post_meta( get_the_ID(), '_mfields_bookmark_link_text', true ),
-				'url'  => (string) esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) ),
-				);
-
-			$text = 'Visit Site';
-			if ( ! empty( $meta['text'] ) ) {
-				$text = $meta['text'];
-			}
-
-			if ( ! empty( $meta['url'] ) ) {
-				$content .= ' <a href="' . esc_url( $meta['url'] ) . '" rel="external">' . esc_html( $text ) . '</a>';
-			}
+		if ( 'mfields_bookmark' != get_post_type() ) {
+			return $content;
 		}
+
+		$meta = array(
+			'text' => (string) get_post_meta( get_the_ID(), '_mfields_bookmark_link_text', true ),
+			'url'  => (string) esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) ),
+			);
+
+		$text = 'Visit Site';
+		if ( ! empty( $meta['text'] ) ) {
+			$text = $meta['text'];
+		}
+
+		if ( ! empty( $meta['url'] ) ) {
+			$content .= ' <a href="' . esc_url( $meta['url'] ) . '" rel="external" class="button">' . esc_html( $text ) . '</a>';
+		}
+
 		return $content;
 	}
 	/**
