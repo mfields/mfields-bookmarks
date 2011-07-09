@@ -27,6 +27,10 @@ Mfields_Bookmarks::init();
 
 class Mfields_Bookmarks {
 
+	const post_type = 'mfields_bookmark';
+	const meta_url  = '_mfields_bookmark_url';
+	const meta_text = '_mfields_bookmark_link_text';
+
 	/**
 	 * Constructor.
 	 *
@@ -99,7 +103,7 @@ class Mfields_Bookmarks {
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
 			return;
 		}
-		register_post_type( 'mfields_bookmark', array(
+		register_post_type( self::post_type, array(
 			'public'        => true,
 			'can_export'    => true,
 			'has_archive'   => 'bookmarks',
@@ -144,7 +148,7 @@ class Mfields_Bookmarks {
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
 			return;
 		}
-		register_taxonomy( 'mfields_bookmark_type', 'mfields_bookmark', array(
+		register_taxonomy( self::post_type . '_type', self::post_type, array(
 			'hierarchical'          => true,
 			'query_var'             => 'bookmark_type',
 			'rewrite'               => array( 'slug' => 'bookmark-type' ),
@@ -163,7 +167,7 @@ class Mfields_Bookmarks {
 				'new_item_name'     => 'New Type Name'
 				)
 			) );
-		register_taxonomy( 'mfields_bookmark_source', 'mfields_bookmark', array(
+		register_taxonomy( self::post_type . '_source', self::post_type, array(
 			'hierarchical'          => true,
 			'query_var'             => 'bookmark_source',
 			'rewrite'               => array( 'slug' => 'bookmark-source' ),
@@ -183,10 +187,10 @@ class Mfields_Bookmarks {
 				)
 			) );
 		if ( taxonomy_exists( 'topics' ) ) {
-			register_taxonomy_for_object_type( 'topics', 'mfields_bookmark' );
+			register_taxonomy_for_object_type( 'topics', self::post_type );
 		}
 		else {
-			register_taxonomy( "mfields_bookmark_topic", 'post', array(
+			register_taxonomy( self::post_type . '_topic', 'post', array(
 				'hierarchical'          => true,
 				'query_var'             => 'bookmark_topic',
 				'rewrite'               => array( 'slug' => 'bookmark-topic' ),
@@ -214,13 +218,13 @@ class Mfields_Bookmarks {
 	 * @since      unknown
 	 */
 	static public function append_link_to_content( $content ) {
-		if ( 'mfields_bookmark' != get_post_type() ) {
+		if ( self::post_type != get_post_type() ) {
 			return $content;
 		}
 
 		$meta = array(
-			'text' => (string) get_post_meta( get_the_ID(), '_mfields_bookmark_link_text', true ),
-			'url'  => (string) esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) ),
+			'text' => (string) get_post_meta( get_the_ID(), self::meta_text, true ),
+			'url'  => (string) esc_url( get_post_meta( get_the_ID(), self::meta_url, true ) ),
 			);
 
 		$text = 'Visit Site';
@@ -241,12 +245,12 @@ class Mfields_Bookmarks {
 	 * @since      unknown
 	 */
 	static public function process_bookmarklet() {
-		if ( isset( $_GET['mfields_bookmark_url'] ) && 'mfields_bookmark' === get_post_type() ) {
-			$url = esc_url( $_GET['mfields_bookmark_url'] );
+		if ( isset( $_GET[ self::post_type . '_url'] ) && self::post_type === get_post_type() ) {
+			$url = esc_url( $_GET[ self::post_type . '_url'] );
 			print <<< EOF
 			<script type="text/javascript">
 			jQuery( document ).ready( function ( $ ) {
-				$( '#mfields_bookmark_url' ).val( 'resource_url' );
+				$( '#{self::post_type}_url' ).val( 'resource_url' );
 			} );
 			</script>
 EOF;
@@ -260,7 +264,7 @@ EOF;
 	 * @since      2011-03-12
 	 */
 	static public function register_meta_boxen() {
-		add_meta_box( 'mfields_bookmark_meta', 'Bookmark Data', array( __class__, 'meta_box' ), 'mfields_bookmark', 'side', 'high' );
+		add_meta_box( self::post_type . '_meta', 'Bookmark Data', array( __class__, 'meta_box' ), self::post_type, 'side', 'high' );
 	}
 
 	/**
@@ -269,20 +273,19 @@ EOF;
 	 * @since      2011-03-12
 	 */
 	static public function meta_box() {
+
 		/* URL. */
-		$key = '_mfields_bookmark_url';
-		$url = get_post_meta( get_the_ID(), $key, true );
-		print "\n\t" . '<p><label for="' . esc_attr( $key ) . '">URL</label>';
-		print "\n\t" . '<input id="' . esc_attr( $key ) . '" type="text" class="widefat" name="' . esc_attr( $key ) . '" value="' . esc_url( $url ) . '" /></p>';
+		$url = get_post_meta( get_the_ID(), self::meta_url, true );
+		print "\n\t" . '<p><label for="' . esc_attr( self::meta_url ) . '">URL</label>';
+		print "\n\t" . '<input id="' . esc_attr( self::meta_url ) . '" type="text" class="widefat" name="' . esc_attr( self::meta_url ) . '" value="' . esc_url( $url ) . '" /></p>';
 
 		/* Link Text. */
-		$key = '_mfields_bookmark_link_text';
-		$text = get_post_meta( get_the_ID(), $key, true );
-		print "\n\t" . '<p><label for="' . esc_attr( $key ) . '">Link Text</label>';
-		print "\n\t" . '<input id="' . esc_attr( $key ) . '" type="text" class="widefat" name="' . esc_attr( $key ) . '" value="' . esc_attr( $text ) . '" /></p>';
+		$text = get_post_meta( get_the_ID(), self::meta_text, true );
+		print "\n\t" . '<p><label for="' . esc_attr( self::meta_text ) . '">Link Text</label>';
+		print "\n\t" . '<input id="' . esc_attr( self::meta_text ) . '" type="text" class="widefat" name="' . esc_attr( self::meta_text ) . '" value="' . esc_attr( $text ) . '" /></p>';
 
 		/* Nonce field. */
-		print "\n" . '<input type="hidden" name="mfields_bookmark_meta_nonce" value="' . esc_attr( wp_create_nonce( 'update-mfields_bookmark-meta-for-' . get_the_ID() ) ) . '" />';
+		print "\n" . '<input type="hidden" name="' . self::post_type . '_meta_nonce" value="' . esc_attr( wp_create_nonce( 'update-' . self::post_type . '-meta-for-' . get_the_ID() ) ) . '" />';
 	}
 
 	/**
@@ -293,7 +296,7 @@ EOF;
 	static public function meta_save( $ID, $post ) {
 		/* Local variables. */
 		$ID               = absint( $ID );
-		$unique           = 'mfields_bookmark_url';
+		$unique           = self::post_type . '_url';
 		$meta_key         = '_' . $unique;
 		$post_type        = get_post_type();
 		$post_type_object = get_post_type_object( $post_type );
@@ -306,17 +309,17 @@ EOF;
 		}
 
 		/* Return early if custom value is not present in POST request. */
-		if ( ! isset( $_POST['_mfields_bookmark_url'] ) || ! isset( $_POST['_mfields_bookmark_link_text'] ) ) {
+		if ( ! isset( $_POST[self::meta_url] ) || ! isset( $_POST[self::meta_text] ) ) {
 			return;
 		}
 
 		/* This function only applies to the following post_types. */
-		if ( ! in_array( $post_type, array( 'mfields_bookmark' ) ) ) {
+		if ( ! in_array( $post_type, array( self::post_type ) ) ) {
 			return;
 		}
 
 		/* Terminate script if accessed from outside the administration panels. */
-		check_admin_referer( 'update-mfields_bookmark-meta-for-' . $ID, 'mfields_bookmark_meta_nonce' );
+		check_admin_referer( 'update-' . self::post_type . '-meta-for-' . $ID, self::post_type . '_meta_nonce' );
 
 		/* Find correct capability from post_type arguments. */
 		if ( isset( $post_type_object->cap->edit_posts ) ) {
@@ -329,8 +332,8 @@ EOF;
 		}
 
 		/* Save post meta. */
-		update_post_meta( $ID, '_mfields_bookmark_url', esc_url_raw( $_POST['_mfields_bookmark_url'] ) );
-		update_post_meta( $ID, '_mfields_bookmark_link_text', esc_html( $_POST['_mfields_bookmark_link_text'] ) );
+		update_post_meta( $ID, self::meta_url, esc_url_raw( $_POST[self::meta_url] ) );
+		update_post_meta( $ID, self::meta_text, esc_html( $_POST[self::meta_text] ) );
 
 	}
 
@@ -345,7 +348,7 @@ EOF;
 	 * @since      2011-03-12
 	 */
 	static public function screenshot( $html ) {
-		if ( empty( $html ) || 'mfields_bookmark' == get_post_type() ) {
+		if ( empty( $html ) || self::post_type == get_post_type() ) {
 			$url = esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) );
 			if ( ! empty( $url ) ) {
 				$src = 'http://s.wordpress.com/mshots/v1/' . urlencode( $url ) . '?w=150';
