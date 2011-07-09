@@ -23,7 +23,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-class Mfields_Bookmark_Post_Type {
+Mfields_Bookmarks::init();
+
+class Mfields_Bookmarks {
 	/**
 	 * Constructor.
 	 *
@@ -32,16 +34,16 @@ class Mfields_Bookmark_Post_Type {
 	 * @return     void
 	 * @since      2011-02-20
 	 */
-	 function Mfields_Bookmark_Post_Type() {
-		register_activation_hook( __FILE__, array( &$this, 'activate' ) );
-		register_deactivation_hook( __FILE__, array( &$this, 'deactivate' ) );
-		add_action( 'init', array( &$this, 'register_post_type' ), 0 );
-		add_action( 'init', array( &$this, 'register_taxonomies' ), 0 );
-		add_action( 'admin_menu', array( &$this, 'register_meta_boxen' ) );
-		add_action( 'admin_head-post-new.php', array( &$this, 'process_bookmarklet' ) );
-		add_action( 'save_post', array( &$this, 'meta_save' ), 10, 2 );
-		add_filter( 'the_content', array( &$this, 'append_link_to_content' ), 20 );
-		add_filter( 'post_thumbnail_html', array( &$this, 'screenshot' ) );
+	static public function init() {
+		register_activation_hook( __file__,    array( __class__, 'activate' ) );
+		register_deactivation_hook( __file__,  array( __class__, 'deactivate' ) );
+		add_action( 'init',                    array( __class__, 'register_post_type' ), 0 );
+		add_action( 'init',                    array( __class__, 'register_taxonomies' ), 0 );
+		add_action( 'admin_menu',              array( __class__, 'register_meta_boxen' ) );
+		add_action( 'admin_head-post-new.php', array( __class__, 'process_bookmarklet' ) );
+		add_action( 'save_post',               array( __class__, 'meta_save' ), 10, 2 );
+		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 20 );
+		add_filter( 'post_thumbnail_html',     array( __class__, 'screenshot' ) );
 	}
 	/**
 	 * Activation.
@@ -56,9 +58,9 @@ class Mfields_Bookmark_Post_Type {
 	 * @return     void
 	 * @since      2011-02-20
 	 */
-	function activate() {
-		$this->register_post_type();
-		$this->register_taxonomies();
+	static public function activate() {
+		self::register_post_type();
+		self::register_taxonomies();
 		flush_rewrite_rules();
 	}
 	/**
@@ -71,7 +73,7 @@ class Mfields_Bookmark_Post_Type {
 	 * @return     void
 	 * @since      2011-02-20
 	 */
-	function deactivate() {
+	static public function deactivate() {
 		flush_rewrite_rules();
 	}
 	/**
@@ -89,7 +91,7 @@ class Mfields_Bookmark_Post_Type {
 	 * @return     void
 	 * @since      2011-02-20
 	 */
-	function register_post_type() {
+	static public function register_post_type() {
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
 			return;
 		}
@@ -133,7 +135,7 @@ class Mfields_Bookmark_Post_Type {
 	 * @return     void
 	 * @since      2011-02-20
 	 */
-	function register_taxonomies() {
+	static public function register_taxonomies() {
 		if ( isset( $_REQUEST['action'] ) && 'deactivate' == $_REQUEST['action'] ) {
 			return;
 		}
@@ -205,7 +207,7 @@ class Mfields_Bookmark_Post_Type {
 	 *
 	 * @since      unknown
 	 */
-	function append_link_to_content( $content ) {
+	static public function append_link_to_content( $content ) {
 		if ( 'mfields_bookmark' != get_post_type() ) {
 			return $content;
 		}
@@ -231,7 +233,7 @@ class Mfields_Bookmark_Post_Type {
 	 *
 	 * @since      unknown
 	 */
-	function process_bookmarklet() {
+	static public function process_bookmarklet() {
 		if ( isset( $_GET['mfields_bookmark_url'] ) && 'mfields_bookmark' === get_post_type() ) {
 			$url = esc_url( $_GET['mfields_bookmark_url'] );
 			print <<< EOF
@@ -246,18 +248,18 @@ EOF;
 	/**
 	 * Register Metaboxen.
 	 *
-	 * @uses       Mfields_Bookmark_Post_Type::meta_box()
+	 * @uses       Mfields_Bookmarks::meta_box()
 	 * @since      2011-03-12
 	 */
-	function register_meta_boxen() {
-		add_meta_box( 'mfields_bookmark_meta', 'Bookmark Data', array( &$this, 'meta_box' ), 'mfields_bookmark', 'side', 'high' );
+	static public function register_meta_boxen() {
+		add_meta_box( 'mfields_bookmark_meta', 'Bookmark Data', array( __class__, 'meta_box' ), 'mfields_bookmark', 'side', 'high' );
 	}
 	/**
 	 * Meta Box.
 	 *
 	 * @since      2011-03-12
 	 */
-	function meta_box() {
+	static public function meta_box() {
 		/* URL. */
 		$key = '_mfields_bookmark_url';
 		$url = get_post_meta( get_the_ID(), $key, true );
@@ -278,7 +280,7 @@ EOF;
 	 *
 	 * @since      2011-03-12
 	 */
-	function meta_save( $ID, $post ) {
+	static public function meta_save( $ID, $post ) {
 		/* Local variables. */
 		$ID               = absint( $ID );
 		$unique           = 'mfields_bookmark_url';
@@ -331,7 +333,7 @@ EOF;
 	 *
 	 * @since      2011-03-12
 	 */
-	function screenshot( $html ) {
+	static public function screenshot( $html ) {
 		if ( empty( $html ) || 'mfields_bookmark' == get_post_type() ) {
 			$url = esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) );
 			if ( ! empty( $url ) ) {
@@ -342,4 +344,3 @@ EOF;
 		return $html;
 	}
 }
-$mfields_bookmark_post_type = new Mfields_Bookmark_Post_Type();
