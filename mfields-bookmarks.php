@@ -43,7 +43,7 @@ class Mfields_Bookmarks {
 		register_activation_hook( __file__,    array( __class__, 'activate' ) );
 		register_deactivation_hook( __file__,  array( __class__, 'deactivate' ) );
 		add_action( 'init',                    array( __class__, 'register_post_type' ), 0 );
-		add_action( 'init',                    array( __class__, 'register_taxonomies' ), 0 );
+		add_action( 'init',                    array( __class__, 'register_taxonomies' ), 2 );
 		add_action( 'admin_menu',              array( __class__, 'register_meta_boxen' ) );
 		add_action( 'admin_head-post-new.php', array( __class__, 'process_bookmarklet' ) );
 		add_action( 'save_post',               array( __class__, 'meta_save' ), 10, 2 );
