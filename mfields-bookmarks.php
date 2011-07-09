@@ -47,7 +47,7 @@ class Mfields_Bookmarks {
 		add_action( 'admin_menu',              array( __class__, 'register_meta_boxen' ) );
 		add_action( 'admin_head-post-new.php', array( __class__, 'process_bookmarklet' ) );
 		add_action( 'save_post',               array( __class__, 'meta_save' ), 10, 2 );
-		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 20 );
+		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 0 );
 		add_filter( 'post_thumbnail_html',     array( __class__, 'screenshot' ) );
 	}
 
@@ -233,7 +233,7 @@ class Mfields_Bookmarks {
 		}
 
 		if ( ! empty( $meta['url'] ) ) {
-			$content .= ' <a href="' . esc_url( $meta['url'] ) . '" rel="external" class="button">' . esc_html( $text ) . '</a>';
+			$content .= ' <a href="' . esc_url( $meta['url'] ) . '" rel="external">' . esc_html( $text ) . '</a>';
 		}
 
 		return $content;
