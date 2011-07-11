@@ -48,7 +48,6 @@ class Mfields_Bookmarks {
 		add_action( 'admin_head-post-new.php', array( __class__, 'process_bookmarklet' ) );
 		add_action( 'save_post',               array( __class__, 'meta_save' ), 10, 2 );
 		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 0 );
-		add_filter( 'post_thumbnail_html',     array( __class__, 'screenshot' ) );
 	}
 
 	/**
@@ -334,27 +333,5 @@ EOF;
 		/* Save post meta. */
 		update_post_meta( $ID, self::meta_url, esc_url_raw( $_POST[self::meta_url] ) );
 		update_post_meta( $ID, self::meta_text, esc_html( $_POST[self::meta_text] ) );
-
-	}
-
-	/**
-	 * Screenshot.
-	 *
-	 * This is a modified version of Binary Moon's bm_shots plugin.
-	 * Uses WordPress API to take a screen shot where no featured image
-	 * has been defined. This should be viewed as an emergency fallback
-	 * until a featured image can be acquired.
-	 *
-	 * @since      2011-03-12
-	 */
-	static public function screenshot( $html ) {
-		if ( empty( $html ) || self::post_type == get_post_type() ) {
-			$url = esc_url( get_post_meta( get_the_ID(), '_mfields_bookmark_url', true ) );
-			if ( ! empty( $url ) ) {
-				$src = 'http://s.wordpress.com/mshots/v1/' . urlencode( $url ) . '?w=150';
-				$html = "\n" . '<a href="' . esc_url( $url ) . '" tabindex="-1"><img src="' . esc_url( $src ) . '" alt="" /></a>';
-			}
-		}
-		return $html;
 	}
 }
