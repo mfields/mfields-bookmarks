@@ -164,8 +164,8 @@ class Mfields_Bookmarks {
 				'update_item'       => 'Update Type',
 				'add_new_item'      => 'Add a New Type',
 				'new_item_name'     => 'New Type Name'
-				)
-			) );
+			)
+		) );
 		register_taxonomy( self::post_type . '_source', self::post_type, array(
 			'hierarchical'          => true,
 			'query_var'             => 'bookmark_source',
@@ -183,32 +183,27 @@ class Mfields_Bookmarks {
 				'update_item'       => 'Update Source',
 				'add_new_item'      => 'Add a New Source',
 				'new_item_name'     => 'New Source'
-				)
-			) );
-		if ( taxonomy_exists( 'topics' ) ) {
-			register_taxonomy_for_object_type( 'topics', self::post_type );
-		}
-		else {
-			register_taxonomy( self::post_type . '_topic', 'post', array(
-				'hierarchical'          => true,
-				'query_var'             => 'bookmark_topic',
-				'rewrite'               => array( 'slug' => 'bookmark-topic' ),
-				'show_tagcloud'         => false,
-				'update_count_callback' => '_update_post_term_count',
-				'labels' => array(
-					'name'              => 'Topics',
-					'singular_name'     => 'Topic',
-					'search_items'      => 'Search Topics',
-					'all_items'         => 'All Topics',
-					'parent_item'       => 'Parent Topic',
-					'parent_item_colon' => 'Parent Topic:',
-					'edit_item'         => 'Edit Topic',
-					'update_item'       => 'Update Topic',
-					'add_new_item'      => 'Add a New Topic',
-					'new_item_name'     => 'New Topic Name'
-					)
-				) );
-		}
+			)
+		) );
+		register_taxonomy( self::post_type . '_topic', 'post', array(
+			'hierarchical'          => true,
+			'query_var'             => 'bookmark_topic',
+			'rewrite'               => array( 'slug' => 'bookmark-topic' ),
+			'show_tagcloud'         => false,
+			'update_count_callback' => '_update_post_term_count',
+			'labels' => array(
+				'name'              => 'Topics',
+				'singular_name'     => 'Topic',
+				'search_items'      => 'Search Topics',
+				'all_items'         => 'All Topics',
+				'parent_item'       => 'Parent Topic',
+				'parent_item_colon' => 'Parent Topic:',
+				'edit_item'         => 'Edit Topic',
+				'update_item'       => 'Update Topic',
+				'add_new_item'      => 'Add a New Topic',
+				'new_item_name'     => 'New Topic Name'
+			)
+		) );
 	}
 
 	/**
