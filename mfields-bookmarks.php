@@ -49,6 +49,10 @@ class Mfields_Bookmarks {
 		add_action( 'admin_head-post-new.php', self::prefix . 'process_bookmarklet' );
 		add_action( 'save_post',               self::prefix . 'meta_save', 10, 2 );
 		add_filter( 'the_content',             self::prefix . 'append_link_to_content', 0 );
+
+		/* Integrate with the Nighthawk theme. */
+		add_filter( 'nighthawk_table_columns',        self::prefix . 'nighthawk_table_columns' );
+		add_filter( 'nighthawk_archive_meta_strings', self::prefix . 'nighthawk_archive_meta_strings' );
 	}
 
 	/**
@@ -329,5 +333,84 @@ EOF;
 		/* Save post meta. */
 		update_post_meta( $ID, self::meta_url, esc_url_raw( $_POST[self::meta_url] ) );
 		update_post_meta( $ID, self::meta_text, esc_html( $_POST[self::meta_text] ) );
+	}
+
+	public static function nighthawk_table_columns( $columns ) {
+		if ( is_post_type_archive( self::post_type ) ) {
+			$columns = array(
+				array(
+					'label'    => __( 'Post Title', 'nighthawk' ),
+					'class'    => 'post-title',
+					'callback' => 'nighthawk_td_title',
+				),
+				array(
+					'label'    => __( 'Source', 'nighthawk' ),
+					'class'    => 'bookmark-source',
+					'callback' => self::prefix . 'nighthawk_td_bookmark_source',
+				),
+				array(
+					'label'    => __( 'Permalink', 'nighthawk' ),
+					'class'    => 'permalink',
+					'callback' => 'nighthawk_td_permalink_icon',
+				),
+			);
+		} else if ( is_tax( self::post_type . '_source' ) ) {
+			$columns = array(
+				array(
+					'label'    => __( 'Post Title', 'nighthawk' ),
+					'class'    => 'post-title',
+					'callback' => 'nighthawk_td_title',
+				),
+				array(
+					'label'    => __( 'Permalink', 'nighthawk' ),
+					'class'    => 'permalink',
+					'callback' => 'nighthawk_td_permalink_icon',
+				),
+			);
+		} else if ( is_tax( self::post_type . '_type' ) ) {
+			$columns = array(
+				array(
+					'label'    => __( 'Post Title', 'nighthawk' ),
+					'class'    => 'post-title',
+					'callback' => 'nighthawk_td_title',
+				),
+				array(
+					'label'    => __( 'Source', 'nighthawk' ),
+					'class'    => 'bookmark-source',
+					'callback' => self::prefix . 'nighthawk_td_bookmark_source',
+				),
+				array(
+					'label'    => __( 'Permalink', 'nighthawk' ),
+					'class'    => 'permalink',
+					'callback' => 'nighthawk_td_permalink_icon',
+				),
+			);
+		}
+		return $columns;
+	}
+
+	function nighthawk_archive_meta_strings( $strings ) {
+		if ( is_post_type_archive( self::post_type ) ) {
+			$strings['count']      = _n_noop( 'There is %1$s bookmark in this section.', 'There are %1$s bookmarks in this section.' );
+			$strings['feed_text']  = __( 'Subscribe', 'mfields_bookmarks' );
+			$strings['feed_title'] = __( 'Get updated whenever new bookmarks are added.', 'mfields_bookmarks' );
+		}
+		return $strings;
+	}
+
+	function nighthawk_td_bookmark_source( $column = array() ) {
+		$taxonomy = self::post_type . '_source';
+		$sources = get_the_terms( get_the_ID(), $taxonomy );
+
+		if ( is_wp_error( $sources ) || empty( $sources ) )
+			return;
+
+		$source = current( (array) $sources );
+
+		$link = esc_html( $source->name );
+		if ( 1 < absint( $source->count ) )
+			$link = '<a href="' . esc_url( get_term_link( $source, $taxonomy ) ) . '">' . $link . '</a>';
+
+		echo "\n\t" . '<td class="' . esc_attr( $column['class'] ) . '">' . $link . '</td>';
 	}
 }
