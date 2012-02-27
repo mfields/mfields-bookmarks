@@ -7,7 +7,7 @@ Author:            Michael Fields
 Author URI:        http://wordpress.mfields.org/
 License:           GPLv2 or later
 
-Copyright 2011     Michael Fields  michael@mfields.org
+Copyright 2011-2012 Michael Fields michael@mfields.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 or later
