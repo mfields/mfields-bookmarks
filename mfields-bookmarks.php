@@ -341,7 +341,7 @@ EOF;
 				array(
 					'label'    => __( 'Post Title', 'nighthawk' ),
 					'class'    => 'post-title',
-					'callback' => 'nighthawk_td_title',
+					'callback' => 'Nighthawk::td_title',
 				),
 				array(
 					'label'    => __( 'Source', 'nighthawk' ),
@@ -351,7 +351,7 @@ EOF;
 				array(
 					'label'    => __( 'Permalink', 'nighthawk' ),
 					'class'    => 'permalink',
-					'callback' => 'nighthawk_td_permalink_icon',
+					'callback' => 'Nighthawk::td_permalink_icon',
 				),
 			);
 		} else if ( is_tax( self::post_type . '_source' ) ) {
@@ -359,12 +359,12 @@ EOF;
 				array(
 					'label'    => __( 'Post Title', 'nighthawk' ),
 					'class'    => 'post-title',
-					'callback' => 'nighthawk_td_title',
+					'callback' => 'Nighthawk::td_title',
 				),
 				array(
 					'label'    => __( 'Permalink', 'nighthawk' ),
 					'class'    => 'permalink',
-					'callback' => 'nighthawk_td_permalink_icon',
+					'callback' => 'Nighthawk::td_permalink_icon',
 				),
 			);
 		} else if ( is_tax( self::post_type . '_type' ) ) {
@@ -372,7 +372,7 @@ EOF;
 				array(
 					'label'    => __( 'Post Title', 'nighthawk' ),
 					'class'    => 'post-title',
-					'callback' => 'nighthawk_td_title',
+					'callback' => 'Nighthawk::td_title',
 				),
 				array(
 					'label'    => __( 'Source', 'nighthawk' ),
@@ -382,7 +382,7 @@ EOF;
 				array(
 					'label'    => __( 'Permalink', 'nighthawk' ),
 					'class'    => 'permalink',
-					'callback' => 'nighthawk_td_permalink_icon',
+					'callback' => 'Nighthawk::td_permalink_icon',
 				),
 			);
 		}
