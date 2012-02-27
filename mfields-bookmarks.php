@@ -27,6 +27,7 @@ Mfields_Bookmarks::init();
 
 class Mfields_Bookmarks {
 
+	const prefix    = 'Mfields_Bookmarks::';
 	const post_type = 'mfields_bookmark';
 	const meta_url  = '_mfields_bookmark_url';
 	const meta_text = '_mfields_bookmark_link_text';
@@ -40,14 +41,14 @@ class Mfields_Bookmarks {
 	 * @since      2011-02-20
 	 */
 	static public function init() {
-		register_activation_hook( __file__,    array( __class__, 'activate' ) );
-		register_deactivation_hook( __file__,  array( __class__, 'deactivate' ) );
-		add_action( 'init',                    array( __class__, 'register_post_type' ), 0 );
-		add_action( 'init',                    array( __class__, 'register_taxonomies' ), 2 );
-		add_action( 'admin_menu',              array( __class__, 'register_meta_boxen' ) );
-		add_action( 'admin_head-post-new.php', array( __class__, 'process_bookmarklet' ) );
-		add_action( 'save_post',               array( __class__, 'meta_save' ), 10, 2 );
-		add_filter( 'the_content',             array( __class__, 'append_link_to_content' ), 0 );
+		register_activation_hook( __file__,    self::prefix . 'activate' );
+		register_deactivation_hook( __file__,  self::prefix . 'deactivate' );
+		add_action( 'init',                    self::prefix . 'register_post_type', 0 );
+		add_action( 'init',                    self::prefix . 'register_taxonomies', 2 );
+		add_action( 'admin_menu',              self::prefix . 'register_meta_boxen' );
+		add_action( 'admin_head-post-new.php', self::prefix . 'process_bookmarklet' );
+		add_action( 'save_post',               self::prefix . 'meta_save', 10, 2 );
+		add_filter( 'the_content',             self::prefix . 'append_link_to_content', 0 );
 	}
 
 	/**
