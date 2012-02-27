@@ -27,7 +27,6 @@ Mfields_Bookmarks::init();
 
 class Mfields_Bookmarks {
 
-	const prefix    = 'Mfields_Bookmarks::';
 	const post_type = 'mfields_bookmark';
 	const meta_url  = '_mfields_bookmark_url';
 	const meta_text = '_mfields_bookmark_link_text';
@@ -41,18 +40,18 @@ class Mfields_Bookmarks {
 	 * @since      2011-02-20
 	 */
 	static public function init() {
-		register_activation_hook( __file__,    self::prefix . 'activate' );
-		register_deactivation_hook( __file__,  self::prefix . 'deactivate' );
-		add_action( 'init',                    self::prefix . 'register_post_type', 0 );
-		add_action( 'init',                    self::prefix . 'register_taxonomies', 2 );
-		add_action( 'admin_menu',              self::prefix . 'register_meta_boxen' );
-		add_action( 'admin_head-post-new.php', self::prefix . 'process_bookmarklet' );
-		add_action( 'save_post',               self::prefix . 'meta_save', 10, 2 );
-		add_filter( 'the_content',             self::prefix . 'append_link_to_content', 0 );
+		register_activation_hook( __file__,    'Mfields_Bookmarks::activate' );
+		register_deactivation_hook( __file__,  'Mfields_Bookmarks::deactivate' );
+		add_action( 'init',                    'Mfields_Bookmarks::register_post_type', 0 );
+		add_action( 'init',                    'Mfields_Bookmarks::register_taxonomies', 2 );
+		add_action( 'admin_menu',              'Mfields_Bookmarks::register_meta_boxen' );
+		add_action( 'admin_head-post-new.php', 'Mfields_Bookmarks::process_bookmarklet' );
+		add_action( 'save_post',               'Mfields_Bookmarks::meta_save', 10, 2 );
+		add_filter( 'the_content',             'Mfields_Bookmarks::append_link_to_content', 0 );
 
 		/* Integrate with the Nighthawk theme. */
-		add_filter( 'nighthawk_table_columns',        self::prefix . 'nighthawk_table_columns' );
-		add_filter( 'nighthawk_archive_meta_strings', self::prefix . 'nighthawk_archive_meta_strings' );
+		add_filter( 'nighthawk_table_columns',        'Mfields_Bookmarks::nighthawk_table_columns' );
+		add_filter( 'nighthawk_archive_meta_strings', 'Mfields_Bookmarks::nighthawk_archive_meta_strings' );
 	}
 
 	/**
@@ -346,7 +345,7 @@ EOF;
 				array(
 					'label'    => __( 'Source', 'nighthawk' ),
 					'class'    => 'bookmark-source',
-					'callback' => self::prefix . 'nighthawk_td_bookmark_source',
+					'callback' => 'Mfields_Bookmarks::nighthawk_td_bookmark_source',
 				),
 				array(
 					'label'    => __( 'Permalink', 'nighthawk' ),
@@ -377,7 +376,7 @@ EOF;
 				array(
 					'label'    => __( 'Source', 'nighthawk' ),
 					'class'    => 'bookmark-source',
-					'callback' => self::prefix . 'nighthawk_td_bookmark_source',
+					'callback' => 'Mfields_Bookmarks::nighthawk_td_bookmark_source',
 				),
 				array(
 					'label'    => __( 'Permalink', 'nighthawk' ),
