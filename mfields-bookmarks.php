@@ -334,6 +334,24 @@ EOF;
 		update_post_meta( $ID, self::meta_text, esc_html( $_POST[self::meta_text] ) );
 	}
 
+	/**
+	 * Define table columns for post_type and taxonomy archives.
+	 *
+	 * Compatibility with the Nighthawk theme.
+	 * @see https://github.com/mfields/nighthawk
+	 *
+	 * This filter is attached to the "nighthawk_table_columns" hook.
+	 * @see Nighthawk::filter_table_columns()
+	 *
+	 * @uses Nighthawk::td_title()
+	 * @uses Nighthawk::td_permalink_icon()
+	 * @uses Mfields_Bookmarks::nighthawk_td_bookmark_source()
+	 *
+	 * @param array $columns
+	 * @return array modified table columns.
+	 *
+	 * @since Mfields Bookmarks 0.4
+	 */
 	public static function nighthawk_table_columns( $columns ) {
 		if ( is_post_type_archive( self::post_type ) ) {
 			$columns = array(
@@ -388,6 +406,19 @@ EOF;
 		return $columns;
 	}
 
+	/**
+	 * Define strings to be used in post_type archives.
+	 *
+	 * Compatibility with the Nighthawk theme.
+	 * @see https://github.com/mfields/nighthawk
+	 *
+	 * This filter is attached to the "nighthawk_archive_meta_strings" hook.
+	 *
+	 * @param array $string Default strings defined by Nighthawk.
+	 * @return array Modified, internationalized strings.
+	 *
+	 * @since Mfields Bookmarks 0.4
+	 */
 	function nighthawk_archive_meta_strings( $strings ) {
 		if ( is_post_type_archive( self::post_type ) ) {
 			$strings['count']      = _n_noop( 'There is %1$s bookmark in this section.', 'There are %1$s bookmarks in this section.' );
@@ -397,6 +428,17 @@ EOF;
 		return $strings;
 	}
 
+	/**
+	 * Displays a link to the source of the bookmark.
+	 *
+	 * Compatibility with the Nighthawk theme.
+	 * @see https://github.com/mfields/nighthawk
+	 *
+	 * @param array $column Configuration for the current column. "class" and "label" are available.
+	 * @return void
+	 *
+	 * @since Mfields Bookmarks 0.4
+	 */
 	function nighthawk_td_bookmark_source( $column = array() ) {
 		$taxonomy = self::post_type . '_source';
 		$sources = get_the_terms( get_the_ID(), $taxonomy );
