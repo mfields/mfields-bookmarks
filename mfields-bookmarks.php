@@ -2,7 +2,7 @@
 /*
 Plugin Name:       Mfields Bookmarks
 Description:       Enables a custom post_type for bookmarks.
-Version:           0.3
+Version:           0.4
 Author:            Michael Fields
 Author URI:        http://wordpress.mfields.org/
 License:           GPLv2 or later
